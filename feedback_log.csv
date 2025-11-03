@@ -1,0 +1,5 @@
+temp,light,motion,hour_of_day,hvac_action,light_action
+25.4,313,NONE,15,ON,OFF
+27.0,10,NONE,15,ON,OFF
+20.27,669,NONE,15,OFF,ON
+29.16,264,DETECTED,15,OFF,ON

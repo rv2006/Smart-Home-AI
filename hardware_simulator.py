@@ -1,43 +1,43 @@
 import paho.mqtt.client as mqtt
 import time
 import random
+import datetime # Used to get the real hour
 
 MQTT_BROKER = "broker.hivemq.com"
-CLIENT_ID = "hardware-simulator-client"
+CLIENT_ID = f"hardware-simulator-client-{random.randint(0, 1000)}"
 
-# This runs when a command is SENT BACK from the AI
 def on_message(client, userdata, msg):
     print(f"--- COMMAND RECEIVED ---")
     print(f"Topic: {msg.topic} | Payload: {msg.payload.decode('utf-8')}")
     print(f"------------------------")
 
-# --- Setup ---
 client = mqtt.Client(client_id=CLIENT_ID)
 client.on_message = on_message
 client.connect(MQTT_BROKER, 1883)
 
-# Subscribe to the control topics to listen for commands
-client.subscribe("myhome/control/light")
-client.subscribe("myhome/control/hvac")
-
-client.loop_start() # Starts a background thread to listen for messages
-print("Hardware Simulator is RUNNING. Publishing sensor data...")
+# Subscribe to all control topics
+client.subscribe("myhome/control/#")
+client.loop_start() 
+print(f"Hardware Simulator ({CLIENT_ID}) is RUNNING. Publishing sensor data...")
 
 try:
     while True:
-        # --- 1. Simulate Sensor Data ---
-        sim_temp = round(random.uniform(20.0, 30.0), 2)
-        sim_light = random.randint(100, 1000)
+        # --- Simulate Data ---
+        sim_temp = round(random.uniform(20.0, 32.0), 2)
+        sim_light = random.randint(10, 1000)
         sim_motion = random.choice(["NONE", "DETECTED"])
+        
+        # --- Get Real Hour ---
+        # This makes the "hour_of_day" feature meaningful
+        current_hour = datetime.datetime.now().hour
 
-        # --- 2. Publish Data to the "Brain" ---
+        # --- Publish Data ---
         client.publish("myhome/sensors/temperature", str(sim_temp))
         client.publish("myhome/sensors/light", str(sim_light))
         client.publish("myhome/sensors/motion", sim_motion)
+        # We don't need to send the hour, the app.py will get it itself.
         
-        print(f"Data Published: Temp={sim_temp} C, Light={sim_light}, Motion={sim_motion}")
-        
-        # Wait 5 seconds before sending new data
+        print(f"Data Published: (Hour: {current_hour}) Temp={sim_temp}, Light={sim_light}, Motion={sim_motion}")
         time.sleep(5) 
 
 except KeyboardInterrupt:
