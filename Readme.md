@@ -1,6 +1,6 @@
 # AI-Powered Smart Home Simulation
 
-This project simulates an AI-powered smart home as part of a CAO project.
+This project simulates an AI-powered smart home as part of a Embedded Systems project.
 
 It consists of two main components:
 - `hardware_simulator.py`: A script that simulates IoT sensors (temp, light, motion) publishing data to an MQTT broker.
